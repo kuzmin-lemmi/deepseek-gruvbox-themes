@@ -27,3 +27,5 @@ jobs:
       - run: pnpm run typecheck
       - run: pnpm test
       - run: pnpm run build
+      - name: Check built lib matches source
+        run: git --no-pager diff --exit-code -- lib/

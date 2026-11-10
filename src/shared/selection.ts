@@ -91,6 +91,26 @@ export function isBuiltInPreference(value: unknown): value is BuiltInPreference 
 }
 
 /**
+ * Whether a base-preference change means the user left this plugin's theme.
+ *
+ * Only a different built-in preference is the Appearance row taking over; a
+ * third-party theme from another plugin is handled separately, and our own
+ * required preference is ignored.
+ *
+ * @param desired - the base preference our layer requires, or `null`.
+ * @param preference - the preference reported by the theme service.
+ * @returns whether the Gruvbox layer should be removed.
+ */
+export function shouldRelinquish(
+  desired: BuiltInPreference | null,
+  preference: string,
+): boolean {
+  if (desired === null) return false
+  if (preference === desired) return false
+  return isBuiltInPreference(preference)
+}
+
+/**
  * The value stored in the `ui-theme` settings namespace, read from an unknown
  * settings section.
  *

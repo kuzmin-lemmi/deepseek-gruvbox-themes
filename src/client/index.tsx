@@ -18,10 +18,10 @@ import {
   BOOT_GLOBAL,
   DEFAULT_SELECTION,
   ENTRY_ID,
-  isBuiltInPreference,
   isConfigTheme,
   normalizeSelection,
   resolveOverride,
+  shouldRelinquish,
 } from '../shared/selection.ts'
 import type { BuiltInPreference, ConfigTheme, SelectionConfig } from '../shared/selection.ts'
 import { DICTIONARIES, SETTINGS_NS } from './locales.ts'
@@ -323,12 +323,11 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.on('theme/change', (payload) => {
     if (applying) return
     const preference = (payload as ThemeSnapshot).preference
-    if (desiredPreference === null) return
-    if (preference === desiredPreference) return
+    if (desiredPreference === null || preference === desiredPreference) return
     // The base preference no longer matches the layer we installed: the user
     // picked another Appearance value (or another theme plugin took over).
     // Drop our override and let the built-in theme own the application.
-    if (isBuiltInPreference(preference)) {
+    if (shouldRelinquish(desiredPreference, preference)) {
       relinquish()
       return
     }

@@ -190,7 +190,7 @@ pnpm run previews:png   # additionally renders the contact sheet with Pillow
 - `lib/index.js` — Host half, ESM, schemastery bundled in, zero runtime dependencies;
 - `lib/client.js` — browser half in the Harness module-loader factory format, React external.
 
-The tests cover the official palette anchors, required token coverage, WCAG contrast for text and state colors, the selection model, the light/dark override builder, and the pre-plugin boot rows. The GitHub Actions workflow runs the same install, typecheck, tests, and build on **Windows, macOS, and Linux**.
+The tests cover the official palette anchors, required token coverage, WCAG contrast for text and state colors, the selection model, the light/dark override builder, the pre-plugin boot rows, settings-entry resolution, and tool argument normalization. The GitHub Actions workflow runs the same install, typecheck, tests, and build on **Windows, macOS, and Linux**, and fails when the committed `lib/` differs from a fresh build.
 
 ### Project layout
 
@@ -205,7 +205,6 @@ docs/previews/  generated previews
 
 ## Known limitations
 
-- **Visual verification was not available in this environment.** There is no browser-control tool here, so the row's rendering and the live color change were verified through the registered slot entry, the applied settings values, the agent tool, and generated previews rather than a screenshot. Open Settings → General once to confirm the row visually.
 - The plugin changes the built-in Appearance preference to match the chosen scheme. Picking a different value in the built-in Appearance row exits the Gruvbox theme; the picker then shows the standard theme.
 - Another plugin that stacks a later token override can win over this layer. Layer order is the theme service's, not this plugin's.
 - Remote browsers can be denied settings writes by the host; the row reports that state and keeps the choice only for the session.

@@ -15,6 +15,9 @@ import {
 } from '../shared/selection.ts'
 import type { ConfigTheme } from '../shared/selection.ts'
 import { GRUVBOX_THEMES } from '../shared/themes.ts'
+import { resolveDescriptor } from './settings.ts'
+import type { SettingsService } from './settings.ts'
+import { normalizeToolPatch } from './tool-patch.ts'
 
 /** Profile entry id; the settings namespace is the same string. */
 export const PACKAGE_NAME = ENTRY_ID
@@ -27,20 +30,6 @@ export const Config = z.object({
     .volatile(),
   followSystem: z.boolean().default(DEFAULT_SELECTION.followSystem).volatile(),
 })
-
-/** One live settings descriptor, narrowed to what this plugin reads. */
-interface SettingsDescriptor {
-  ns: string
-  value: unknown
-  revision: number
-}
-
-/** The part of the Host settings service this plugin uses. */
-interface SettingsService {
-  configure(presentation: { auto?: boolean }, owner: unknown): () => void
-  describe(): SettingsDescriptor[]
-  update(ns: string, patch: Record<string, unknown>, expectedRevision?: number): Promise<void>
-}
 
 /** A structured index-injection row. */
 interface InjectRow {
@@ -89,41 +78,6 @@ function readTheme(value: unknown): ConfigTheme | undefined {
   return isConfigTheme(theme) ? theme : undefined
 }
 
-/** Whether a descriptor's value looks like this plugin's section. */
-function isOurSection(value: unknown): boolean {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'theme' in value &&
-    'followSystem' in value &&
-    isConfigTheme((value as JsonRecord).theme)
-  )
-}
-
-/**
- * Find this plugin's settings namespace.
- *
- * The profile entry id is authoritative; the value-shape lookup is a
- * fallback for a Loader that prefixes entry ids.
- */
-function resolveDescriptor(ctx: HostContext, settings: SettingsService): SettingsDescriptor | undefined {
-  const descriptors = settings.describe()
-  const entry = ctx.fiber?.entry
-  const candidates = [entry?.id, entry?.options?.id].filter(
-    (candidate): candidate is string => typeof candidate === 'string' && candidate.length > 0,
-  )
-  for (const candidate of candidates) {
-    const direct = descriptors.find((descriptor) => descriptor.ns === candidate)
-    if (direct) return direct
-    const stripped = candidate.replace(/^include:/u, '')
-    const strippedMatch = descriptors.find((descriptor) => descriptor.ns === stripped)
-    if (strippedMatch) return strippedMatch
-  }
-  const shaped = descriptors.filter((descriptor) => isOurSection(descriptor.value))
-  if (shaped.length === 1) return shaped[0]
-  return descriptors.find((descriptor) => descriptor.ns === PACKAGE_NAME)
-}
-
 /** Build the tool that shares the settings operation with the agent. */
 function createThemeTool(ctx: HostContext, settings: SettingsService): ToolDefinition {
   const fail = (message: string): JsonRecord => ({ ok: false, message })
@@ -141,7 +95,7 @@ function createThemeTool(ctx: HostContext, settings: SettingsService): ToolDefin
       theme: {
         type: 'string',
         enum: [...CONFIG_THEME_OPTIONS],
-        description: 'Theme id for action "set". "default" restores the built-in theme.',
+        description: 'Theme id for action "set". "default" restores the built-in theme and clears follow-system.',
       },
       followSystem: {
         type: 'boolean',
@@ -180,7 +134,7 @@ function createThemeTool(ctx: HostContext, settings: SettingsService): ToolDefin
     async execute(args: unknown): Promise<JsonRecord> {
       const input = typeof args === 'object' && args !== null ? (args as JsonRecord) : {}
       const action = typeof input.action === 'string' ? input.action : 'status'
-      const descriptor = resolveDescriptor(ctx, settings)
+      const descriptor = resolveDescriptor(ctx.fiber, settings)
 
       if (descriptor === undefined) {
         return fail(
@@ -217,31 +171,20 @@ function createThemeTool(ctx: HostContext, settings: SettingsService): ToolDefin
         return fail(`Unknown action "${action}". Use status, list, set, or reset.`)
       }
 
-      const patch: Record<string, unknown> = {}
-      if (action === 'reset') {
-        patch.theme = 'default'
-        patch.followSystem = false
-      } else {
-        const theme = input.theme
-        if (!isConfigTheme(theme)) {
-          return fail(
-            `"theme" must be one of: ${CONFIG_THEME_OPTIONS.join(', ')}.`,
-          )
-        }
-        patch.theme = theme
-        if (typeof input.followSystem === 'boolean') patch.followSystem = input.followSystem
-      }
+      const normalized = normalizeToolPatch(action, input)
+      if (!normalized.ok) return fail(normalized.message)
+      const patch = normalized.patch
 
       try {
-        await settings.update(namespace, patch, descriptor.revision)
+        await settings.update(namespace, { ...patch }, descriptor.revision)
       } catch (error) {
         return fail(
           `The theme was not saved: ${error instanceof Error ? error.message : String(error)}`,
         )
       }
 
-      const updated = resolveDescriptor(ctx, settings)?.value as JsonRecord | undefined
-      const theme = readTheme(updated) ?? (patch.theme as ConfigTheme)
+      const updated = resolveDescriptor(ctx.fiber, settings)?.value as JsonRecord | undefined
+      const theme = readTheme(updated) ?? patch.theme
       const followSystem = Boolean(updated?.followSystem ?? patch.followSystem)
       return {
         ok: true,

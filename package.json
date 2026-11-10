@@ -1,6 +1,6 @@
 {
   "name": "deepseek-gruvbox-themes",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Seven Gruvbox themes for DeepSeek Harness, with a preview picker, persisted selection, and system light/dark following.",
   "keywords": [
     "deepseek-harness",
@@ -47,7 +47,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node --test --test-isolation=none test/palette.test.ts test/themes.test.ts test/selection.test.ts test/boot.test.ts",
+    "test": "node --test --test-isolation=none test/palette.test.ts test/themes.test.ts test/selection.test.ts test/boot.test.ts test/host.test.ts",
     "previews": "node scripts/previews.mjs",
     "previews:png": "node scripts/previews.mjs && python scripts/contact_sheet.py",
     "check": "npm run typecheck && npm test && npm run build"

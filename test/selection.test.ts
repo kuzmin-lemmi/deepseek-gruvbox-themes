@@ -9,6 +9,7 @@ import {
   readBuiltInPreference,
   resolveOverride,
   resolveThemeId,
+  shouldRelinquish,
 } from '../src/shared/selection.ts'
 
 test('the default selection is the first working dark theme', () => {
@@ -128,4 +129,14 @@ test('readBuiltInPreference narrows a settings section', () => {
   assert.equal(readBuiltInPreference({ preference: 'nord' }), null)
   assert.equal(readBuiltInPreference({}), null)
   assert.equal(readBuiltInPreference(null), null)
+})
+
+test('only a different built-in preference relinquishes the Gruvbox layer', () => {
+  assert.equal(shouldRelinquish('dark', 'light'), true)
+  assert.equal(shouldRelinquish('light', 'system'), true)
+  assert.equal(shouldRelinquish('system', 'dark'), true)
+  assert.equal(shouldRelinquish('dark', 'dark'), false)
+  assert.equal(shouldRelinquish('system', 'system'), false)
+  assert.equal(shouldRelinquish('dark', 'gruvbox-whale'), false)
+  assert.equal(shouldRelinquish(null, 'light'), false)
 })

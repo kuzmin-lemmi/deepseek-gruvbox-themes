@@ -22,7 +22,7 @@ Seven Gruvbox themes for [DeepSeek Harness](https://github.com/deepseek-ai/deeps
 
 Every theme overrides **130 tokens**: backgrounds and surfaces, the sidebar, borders, primary through caption text, brand and buttons, interaction states, success/warning/error/business states, menus, composer, scrollbars, Markdown and diff colors, the Shiki syntax variables, and terminal colors through `--dsw-alias-bg-base` / `--dsw-alias-label-primary`.
 
-The accent is wired where it reads as identity rather than noise: links, keyboard focus rings, `@` reference chips, the active settings row, and settings-card borders. Large surfaces stay neutral.
+The accent is wired where it reads as identity rather than noise: links, keyboard focus rings, `@` reference chips, the active settings row, settings-card borders, and the sidebar brand lockup. Large surfaces stay neutral.
 
 The picker adds a **Gruvbox themes** row with a live preview card per theme (each card is drawn with that theme's own colors), a **Follow system appearance** switch, and a **Use standard theme** reset.
 
@@ -184,6 +184,7 @@ docs/previews/  generated previews
 - Another plugin that stacks a later token override can win over this layer. Layer order is the theme service's, not this plugin's.
 - Remote browsers can be denied settings writes by the host; the row reports that state and keeps the choice only for the session.
 - Whale Edition is dark-only by design.
+- The sidebar lockup is recolored through its CSS-module class suffix (`_brandIdentity`), because the design system has no brand-logo token. If a future Harness renames that class, the logo silently falls back to the normal text color; nothing else breaks.
 
 ## License
 

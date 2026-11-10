@@ -255,4 +255,11 @@ export const PICKER_CSS = `
     animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
 }
+/* The official sidebar lockup paints its fish and wordmark with currentColor
+   and inherits the sidebar text color; the design system has no brand-logo
+   token. The CSS-module hash changes, the class-name suffix is stable, so the
+   attribute selector survives rebuilds and falls back silently if it does not. */
+[class*="_brandIdentity"] svg {
+  color: var(--dsw-alias-brand-primary);
+}
 `

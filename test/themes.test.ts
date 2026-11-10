@@ -28,6 +28,7 @@ const EXTRA_REQUIRED = [
   '--dsw-alias-border-l4',
   '--dsw-alias-label-tertiary',
   '--dsw-alias-button-primary-fill',
+  '--dsw-alias-label-primary-foreground',
   '--dsw-alias-markdown-code-block',
   '--dsw-alias-markdown-inline-code',
   '--shiki-foreground',
@@ -36,6 +37,10 @@ const EXTRA_REQUIRED = [
   '--dsw-alias-toast-bg',
   '--dsw-alias-settings-card-fill',
   '--dsw-specific-sidebar-nav-item-active',
+  '--dsw-static-neutral-50',
+  '--dsw-static-neutral-100',
+  '--dsw-static-neutral-850',
+  '--dsw-static-neutral-800',
 ] as const
 
 const EXPECTED: Readonly<Record<string, { base: string; accent: string }>> = {
@@ -113,14 +118,30 @@ test('text and state colors stay legible on every theme', () => {
       assert.ok(contrastRatio(color, layer1) >= 2.5, `${theme.id} ${state}/layer1`)
     }
 
-    const inverted = t['--dsw-alias-label-primary-inverted'] as `#${string}`
+    const onButton = t['--dsw-alias-label-primary-foreground'] as `#${string}`
     const fill = t['--dsw-alias-button-primary-fill'] as `#${string}`
-    assert.ok(contrastRatio(inverted, fill) >= 3, `${theme.id} inverted label on primary button`)
+    const hover = t['--dsw-alias-button-primary-hover'] as `#${string}`
+    assert.ok(contrastRatio(onButton, fill) >= 4, `${theme.id} primary button text`)
+    assert.ok(contrastRatio(onButton, hover) >= 3.5, `${theme.id} primary button hover text`)
+
+    const contrastFill = t['--dsw-alias-button-contrast-fill'] as `#${string}`
+    const inverted = t['--dsw-alias-label-primary-inverted'] as `#${string}`
+    assert.ok(contrastRatio(inverted, contrastFill) >= 4.5, `${theme.id} inverted label on contrast fill`)
 
     const warnLabel = t['--dsw-alias-state-warn-label'] as `#${string}`
     const warn = t['--dsw-alias-state-warn-primary'] as `#${string}`
     assert.ok(contrastRatio(warnLabel, base) >= 4.5, `${theme.id} warn label on base`)
     assert.ok(contrastRatio(warn, base) >= 3, `${theme.id} warn fill on base`)
+  }
+})
+
+test('card surface statics follow the theme layers', () => {
+  for (const theme of GRUVBOX_THEMES) {
+    const t = theme.tokens
+    assert.equal(t['--dsw-static-neutral-50'], t['--dsw-alias-bg-layer-2'], `${theme.id} neutral-50`)
+    assert.equal(t['--dsw-static-neutral-100'], t['--dsw-alias-bg-layer-3'], `${theme.id} neutral-100`)
+    assert.equal(t['--dsw-static-neutral-850'], t['--dsw-alias-bg-layer-2'], `${theme.id} neutral-850`)
+    assert.equal(t['--dsw-static-neutral-800'], t['--dsw-alias-bg-layer-3'], `${theme.id} neutral-800`)
   }
 })
 

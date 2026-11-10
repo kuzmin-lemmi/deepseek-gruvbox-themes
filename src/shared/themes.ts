@@ -58,6 +58,16 @@ export interface ThemeSpec {
   accentHover: HexColor
   accentQuiet: HexColor
   onAccent: HexColor
+  /**
+   * Primary-button fill, its hover shade, and the text color that sit on it.
+   *
+   * Light themes separate the accent used for text on a cream surface (a dark
+   * faded tone) from the button fill (a brighter tone with dark text), so a
+   * primary button does not read as a dark block.
+   */
+  buttonFill: HexColor
+  buttonHover: HexColor
+  onButton: HexColor
   /** Semantic state colors. */
   success: HexColor
   successAlt: HexColor
@@ -136,6 +146,14 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-bg-mask-3': '#0000007a',
     '--dsw-alias-bg-mask-drop': '#0000004d',
     '--dsw-alias-bg-mask-photo': '#000000e0',
+    // The shipped chat cards (changed files, deliverables, plan, schedule)
+    // paint their headers from these component-local static surfaces. They are
+    // not alias tokens, so a theme layer reaches them only through the static
+    // scale; on a light theme the defaults are near-white.
+    '--dsw-static-neutral-50': spec.layer2,
+    '--dsw-static-neutral-100': spec.layer3,
+    '--dsw-static-neutral-850': spec.layer2,
+    '--dsw-static-neutral-800': spec.layer3,
 
     // Borders
     '--dsw-alias-border-l1': spec.border1,
@@ -154,7 +172,7 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-label-dimmed': spec.muted,
     '--dsw-alias-label-primary-dimmed': spec.fg3,
     '--dsw-alias-label-primary-bluish': spec.fg1,
-    '--dsw-alias-label-primary-foreground': spec.fg1,
+    '--dsw-alias-label-primary-foreground': spec.onButton,
     '--dsw-alias-label-primary-inverted': spec.onAccent,
     '--dsw-alias-label-shimmer': dark ? '#ffffff73' : '#0000004d',
     '--dsw-alias-label-deep-diving': spec.accent,
@@ -166,9 +184,9 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-brand-primary-invert': spec.onAccent,
     '--dsw-alias-brand-text': spec.accent,
     '--dsw-alias-link': spec.info,
-    '--dsw-alias-button-primary-fill': spec.accent,
-    '--dsw-alias-button-primary-hover': spec.accentHover,
-    '--dsw-alias-button-primary-dimmed': withAlpha(spec.accent, 0.22),
+    '--dsw-alias-button-primary-fill': spec.buttonFill,
+    '--dsw-alias-button-primary-hover': spec.buttonHover,
+    '--dsw-alias-button-primary-dimmed': withAlpha(spec.buttonFill, 0.22),
     '--dsw-alias-button-contrast-fill': spec.fg1,
     '--dsw-alias-button-elevated-fill': spec.layer2,
     '--dsw-alias-button-floating-fill': spec.layer2,
@@ -311,6 +329,9 @@ function darkSpec(
     accentHover: colors.accentHover,
     accentQuiet: colors.accentQuiet,
     onAccent: GRUVBOX.dark0Hard,
+    buttonFill: colors.accent,
+    buttonHover: colors.accentHover,
+    onButton: GRUVBOX.dark0Hard,
     success: GRUVBOX.brightGreen,
     successAlt: GRUVBOX.neutralGreen,
     successTertiary: GRUVBOX.neutralAqua,
@@ -342,6 +363,9 @@ function lightSpec(
     accent: HexColor
     accentHover: HexColor
     accentQuiet: HexColor
+    buttonFill: HexColor
+    buttonHover: HexColor
+    onButton: HexColor
   },
 ): ThemeSpec {
   return {
@@ -369,6 +393,9 @@ function lightSpec(
     accentHover: colors.accentHover,
     accentQuiet: colors.accentQuiet,
     onAccent: GRUVBOX.light0Hard,
+    buttonFill: colors.buttonFill,
+    buttonHover: colors.buttonHover,
+    onButton: colors.onButton,
     success: GRUVBOX.fadedGreen,
     successAlt: GRUVBOX.neutralGreen,
     successTertiary: GRUVBOX.fadedAqua,
@@ -433,6 +460,9 @@ export const GRUVBOX_THEMES: readonly GruvboxTheme[] = Object.freeze([
       accent: GRUVBOX.fadedRed,
       accentHover: GRUVBOX.neutralRed,
       accentQuiet: GRUVBOX.fadedOrange,
+      buttonFill: GRUVBOX.neutralRed,
+      buttonHover: GRUVBOX.fadedRed,
+      onButton: GRUVBOX.light0Hard,
     }),
   },
   {
@@ -445,6 +475,9 @@ export const GRUVBOX_THEMES: readonly GruvboxTheme[] = Object.freeze([
       accent: GRUVBOX.fadedOrange,
       accentHover: GRUVBOX.neutralOrange,
       accentQuiet: GRUVBOX.fadedYellow,
+      buttonFill: GRUVBOX.brightOrange,
+      buttonHover: GRUVBOX.neutralOrange,
+      onButton: GRUVBOX.dark0Hard,
     }),
   },
   {
@@ -457,6 +490,9 @@ export const GRUVBOX_THEMES: readonly GruvboxTheme[] = Object.freeze([
       accent: GRUVBOX.fadedYellow,
       accentHover: GRUVBOX.neutralYellow,
       accentQuiet: GRUVBOX.fadedOrange,
+      buttonFill: GRUVBOX.neutralYellow,
+      buttonHover: GRUVBOX.fadedYellow,
+      onButton: GRUVBOX.dark0Hard,
     }),
   },
   {

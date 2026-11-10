@@ -18,7 +18,7 @@ Seven Gruvbox themes for [DeepSeek Harness](https://github.com/deepseek-ai/deeps
 | `gruvbox-light-soft`     | light  | `#f2e5bc` | `#b57614` |
 | `gruvbox-whale`          | dark   | `#282828` | `#83a598` |
 
-Every theme overrides **125 tokens**: backgrounds and surfaces, the sidebar, borders, primary through caption text, brand and buttons, interaction states, success/warning/error/business states, menus, composer, scrollbars, Markdown and diff colors, the Shiki syntax variables, and terminal colors through `--dsw-alias-bg-base` / `--dsw-alias-label-primary`.
+Every theme overrides **129 tokens**: backgrounds and surfaces, the sidebar, borders, primary through caption text, brand and buttons, interaction states, success/warning/error/business states, menus, composer, scrollbars, Markdown and diff colors, the Shiki syntax variables, and terminal colors through `--dsw-alias-bg-base` / `--dsw-alias-label-primary`.
 
 The picker adds a **Gruvbox themes** row with a live preview card per theme (each card is drawn with that theme's own colors), a **Follow system appearance** switch, and a **Use standard theme** reset.
 
@@ -131,6 +131,7 @@ The Host half registers `gruvbox_theme`:
 - interaction: hover, active, accent/danger hovers;
 - states: success, warning, error, idle, business, done (primary/secondary/tertiary where the alias exists);
 - menus, toast, tooltip, switch, turn trigger, settings cards, scrollbars;
+- component card surfaces: the static `neutral-50/100/850/800` fills used by the changed-files, deliverables, plan, and schedule cards, whose defaults are near-white in a light theme;
 - Markdown code block, banner, inline code, citation, segment selection, diff colors;
 - Shiki: `--shiki-foreground`, `--shiki-background`, and every `--shiki-token-*` color.
 

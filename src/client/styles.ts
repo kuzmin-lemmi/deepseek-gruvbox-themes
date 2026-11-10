@@ -246,4 +246,13 @@ export const PICKER_CSS = `
   .dsh-gruvbox-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .dsh-gruvbox-cardDesc { display: none; }
 }
+/* Theme switches run behind a view transition when the engine supports it;
+   the script shortens or skips it for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+}
 `

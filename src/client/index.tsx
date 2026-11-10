@@ -149,6 +149,8 @@ export function apply(ctx: ClientContext): void {
   let override: (() => void) | undefined
   /** Suppresses our own `theme/change` events while applying. */
   let applying = false
+  /** Our settings writes still crossing the wire; form echoes must not revert the optimistic choice. */
+  let pendingWrites = 0
 
   const removeOverride = (): void => {
     override?.()
@@ -162,28 +164,63 @@ export function apply(ctx: ClientContext): void {
     'gruvbox-themes: remove override on unload',
   )
 
-  const applySelection = (selection: SelectionConfig): void => {
-    const resolved = resolveOverride(selection.theme, selection.followSystem)
-    if (resolved === null) {
-      removeOverride()
-      desiredPreference = null
-      store.update({ activeId: null })
+  const reducedMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : null
+
+  /**
+   * Run a theme mutation behind a cross-fade when the engine supports view
+   * transitions. The presenter writes the token variables synchronously, so
+   * the transition snapshots the old palette before the callback and the new
+   * one after it; light/dark switches no longer paint an intermediate frame.
+   */
+  const animateChange = (run: () => void): void => {
+    const doc = document as Document & {
+      startViewTransition?: (callback: () => void | Promise<void>) => { finished?: Promise<unknown> } | undefined
+    }
+    if (reducedMotion?.matches === true || typeof doc.startViewTransition !== 'function') {
+      run()
       return
     }
-    applying = true
     try {
-      if (ctx.theme.getTheme().preference !== resolved.preference) {
-        ctx.theme.setTheme(resolved.preference)
-      }
-      override = ctx.theme.overrideTokens(ENTRY_ID, resolved.modes)
-      desiredPreference = resolved.preference
+      const transition = doc.startViewTransition(() => {
+        run()
+      })
+      transition?.finished?.catch(() => {})
     } catch {
-      store.update({ status: 'failed' })
-      return
-    } finally {
-      applying = false
+      run()
     }
-    store.update({ activeId: selection.theme === 'default' ? null : selection.theme })
+  }
+
+  const applySelection = (selection: SelectionConfig, animate = true): void => {
+    const resolved = resolveOverride(selection.theme, selection.followSystem)
+    const run = (): void => {
+      if (resolved === null) {
+        removeOverride()
+        desiredPreference = null
+        store.update({ activeId: null })
+        return
+      }
+      applying = true
+      try {
+        // Install the palette before changing the base scheme: a fixed light
+        // theme's layer repeats light values in both slots, so flipping the
+        // scheme first would paint the old light tokens on a dark canvas.
+        override = ctx.theme.overrideTokens(ENTRY_ID, resolved.modes)
+        if (ctx.theme.getTheme().preference !== resolved.preference) {
+          ctx.theme.setTheme(resolved.preference)
+        }
+        desiredPreference = resolved.preference
+      } catch {
+        store.update({ status: 'failed' })
+        return
+      } finally {
+        applying = false
+      }
+      store.update({ activeId: selection.theme === 'default' ? null : selection.theme })
+    }
+    if (animate) animateChange(run)
+    else run()
   }
 
   const persist = async (patch: Partial<SelectionConfig>): Promise<void> => {
@@ -208,6 +245,7 @@ export function apply(ctx: ClientContext): void {
       .filter(([, value]) => value !== undefined)
       .map(([field, value]) => ({ op: 'set' as const, path: [field], value }))
     if (ops.length === 0) return
+    pendingWrites += 1
     store.update({ status: 'saving' })
     try {
       const accepted = form.mutate !== undefined
@@ -220,13 +258,18 @@ export function apply(ctx: ClientContext): void {
       store.update({ status: statusAfterWrite(accepted) })
     } catch {
       store.update({ status: 'failed' })
+    } finally {
+      pendingWrites -= 1
+      if (pendingWrites === 0) adoptForm()
     }
   }
 
   const relinquish = (): void => {
-    removeOverride()
-    desiredPreference = null
-    store.update({ theme: 'default', followSystem: false, activeId: null, status: 'idle' })
+    animateChange(() => {
+      removeOverride()
+      desiredPreference = null
+      store.update({ theme: 'default', followSystem: false, activeId: null, status: 'idle' })
+    })
     void persist({ theme: 'default', followSystem: false })
   }
 
@@ -248,14 +291,19 @@ export function apply(ctx: ClientContext): void {
   }
 
   const reset = (): void => {
-    removeOverride()
-    desiredPreference = null
-    store.update({ theme: 'default', followSystem: false, activeId: null, status: 'idle' })
+    animateChange(() => {
+      removeOverride()
+      desiredPreference = null
+      store.update({ theme: 'default', followSystem: false, activeId: null, status: 'idle' })
+    })
     void persist({ theme: 'default', followSystem: false })
   }
 
   const adoptForm = (): void => {
     if (form === undefined) return
+    // Ignore the settings mirror while our own write is in flight: the echo of
+    // the previous value would flip the palette back and forth.
+    if (pendingWrites > 0) return
     const snapshot = form.getSnapshot()
     store.update({ writable: snapshot.writable })
     if (snapshot.status === 'unavailable') {
@@ -284,9 +332,11 @@ export function apply(ctx: ClientContext): void {
       relinquish()
       return
     }
-    removeOverride()
-    desiredPreference = null
-    store.update({ activeId: null })
+    animateChange(() => {
+      removeOverride()
+      desiredPreference = null
+      store.update({ activeId: null })
+    })
   }), 'gruvbox-themes: external theme changes')
 
   if (form !== undefined) {
@@ -295,7 +345,7 @@ export function apply(ctx: ClientContext): void {
     store.update({ writable: initialSnapshot.writable })
   }
 
-  applySelection(initial)
+  applySelection(initial, false)
 
   if (form !== undefined) {
     ctx.effect(() => form!.subscribe(adoptForm), 'gruvbox-themes: settings adoption')

@@ -22,6 +22,8 @@ Every theme overrides **129 tokens**: backgrounds and surfaces, the sidebar, bor
 
 The picker adds a **Gruvbox themes** row with a live preview card per theme (each card is drawn with that theme's own colors), a **Follow system appearance** switch, and a **Use standard theme** reset.
 
+Switching is a 180 ms cross-fade when the engine supports view transitions. The new palette is installed before the base scheme flips, so a light↔dark switch never paints the old light tokens on a dark canvas, and an in-flight settings echo cannot revert the choice halfway through the write.
+
 ## Compatibility and API basis
 
 Built and verified against the installed **DeepSeek Harness `0.2.2-rc.1`** (Client UI theme). The implementation uses only documented extension points:

@@ -63,6 +63,30 @@ export function withAlpha(color: HexColor, alpha: number): string {
   return `${color}${byte}` as HexColor
 }
 
+/**
+ * Linear sRGB mix of two colors.
+ *
+ * Used for the few places where a palette accent needs to move toward another
+ * palette tone (for example, a link color that must clear a contrast target on
+ * a light surface) while staying inside the Gruvbox family.
+ *
+ * @param from - starting color.
+ * @param to - target color.
+ * @param weight - share of `to` from 0 to 1.
+ * @returns the mixed color.
+ */
+export function mixHex(from: HexColor, to: HexColor, weight: number): HexColor {
+  const clamped = Math.max(0, Math.min(1, weight))
+  const channels = [1, 3, 5].map((offset) => {
+    const a = Number.parseInt(from.slice(offset, offset + 2), 16)
+    const b = Number.parseInt(to.slice(offset, offset + 2), 16)
+    return Math.round(a * (1 - clamped) + b * clamped)
+      .toString(16)
+      .padStart(2, '0')
+  })
+  return `#${channels.join('')}` as HexColor
+}
+
 /** WCAG relative luminance of a six-digit hex color. */
 export function luminance(color: HexColor): number {
   const channels = [1, 3, 5].map((offset) => Number.parseInt(color.slice(offset, offset + 2), 16) / 255)

@@ -6,7 +6,7 @@
  * color scheme plus a flat token map. The host theme presenter writes every
  * key onto `document.body`, so keys are CSS custom properties.
  */
-import { GRUVBOX, withAlpha } from './palette.ts'
+import { GRUVBOX, contrastRatio, mixHex, withAlpha } from './palette.ts'
 import type { HexColor } from './palette.ts'
 
 /** The four Gruvbox flavor families shipped by this plugin. */
@@ -129,6 +129,12 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     punctuation: dark ? GRUVBOX.light4 : GRUVBOX.dark3,
     link: dark ? GRUVBOX.brightBlue : GRUVBOX.fadedBlue,
   }
+  // A light accent tuned for large surfaces can fall below the text contrast
+  // target (Gruvbox Light Soft's yellow is the one case). Darken it toward a
+  // Gruvbox brown just enough for links, keeping the accent hue.
+  const link = spec.colorScheme === 'light' && contrastRatio(spec.accent, spec.base) < 4.5
+    ? mixHex(spec.accent, GRUVBOX.dark1, 0.42)
+    : spec.accent
   return Object.freeze({
     // Surfaces
     '--dsw-alias-bg-base': spec.base,
@@ -183,7 +189,8 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-brand-primary': spec.accent,
     '--dsw-alias-brand-primary-invert': spec.onAccent,
     '--dsw-alias-brand-text': spec.accent,
-    '--dsw-alias-link': spec.info,
+    '--dsw-focus-ring-color': link,
+    '--dsw-alias-link': link,
     '--dsw-alias-button-primary-fill': spec.buttonFill,
     '--dsw-alias-button-primary-hover': spec.buttonHover,
     '--dsw-alias-button-primary-dimmed': withAlpha(spec.buttonFill, 0.22),
@@ -211,8 +218,8 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-state-warn-tertiary': spec.warnTertiary,
     '--dsw-alias-state-warn-label': spec.warnLabel,
     '--dsw-alias-state-idle-primary': spec.muted,
-    '--dsw-alias-state-business-primary': spec.info,
-    '--dsw-alias-state-business-tertiary': spec.infoAlt,
+    '--dsw-alias-state-business-primary': link,
+    '--dsw-alias-state-business-tertiary': withAlpha(spec.accent, 0.16),
     '--dsw-alias-state-done-primary': spec.done,
 
     // Interaction
@@ -224,7 +231,7 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
 
     // Sidebar, menus, overlays, composer
     '--dsw-specific-sidebar-fill': spec.sidebar,
-    '--dsw-specific-sidebar-nav-item-active': spec.layer1,
+    '--dsw-specific-sidebar-nav-item-active': withAlpha(spec.accent, 0.12),
     '--dsw-specific-sidebar-nav-item-active-accent': spec.accent,
     '--dsw-specific-menu': withAlpha(spec.layer2, 0.96),
     '--dsw-menu-surface-fill': withAlpha(spec.layer2, 0.96),
@@ -243,7 +250,7 @@ export function buildTokens(spec: ThemeSpec): Readonly<Record<string, string>> {
     '--dsw-alias-turn-trigger-bg-hover': spec.layer2,
     '--dsw-alias-switch-thumb': spec.fg2,
     '--dsw-alias-settings-card-fill': spec.layer1,
-    '--dsw-alias-settings-card-stroke': spec.border3,
+    '--dsw-alias-settings-card-stroke': withAlpha(spec.accent, 0.32),
 
     // Scrollbars
     '--dsw-alias-scrollbar-bg-l1': withAlpha(spec.border2, 0.55),

@@ -1,6 +1,6 @@
 {
   "name": "deepseek-gruvbox-themes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Seven Gruvbox themes for DeepSeek Harness, with a preview picker, persisted selection, and system light/dark following.",
   "keywords": [
     "deepseek-harness",

@@ -29,6 +29,10 @@ const EXTRA_REQUIRED = [
   '--dsw-alias-label-tertiary',
   '--dsw-alias-button-primary-fill',
   '--dsw-alias-label-primary-foreground',
+  '--dsw-alias-link',
+  '--dsw-focus-ring-color',
+  '--dsw-alias-state-business-primary',
+  '--dsw-alias-state-business-tertiary',
   '--dsw-alias-markdown-code-block',
   '--dsw-alias-markdown-inline-code',
   '--shiki-foreground',
@@ -108,7 +112,22 @@ test('text and state colors stay legible on every theme', () => {
     assert.ok(contrastRatio(tertiary, base) >= 3, `${theme.id} tertiary/base`)
     assert.ok(contrastRatio(primary, layer1) >= 5, `${theme.id} primary/layer1`)
     assert.ok(contrastRatio(secondary, layer1) >= 4.5, `${theme.id} secondary/layer1`)
+    const link = t['--dsw-alias-link'] as `#${string}`
     assert.ok(contrastRatio(accent, base) >= 3, `${theme.id} accent/base`)
+    assert.ok(contrastRatio(link, base) >= 4.5, `${theme.id} link/base`)
+    if (theme.id !== 'gruvbox-light-soft') {
+      assert.equal(link, t['--dsw-alias-brand-primary'], `${theme.id} link accent`)
+    }
+    assert.equal(
+      t['--dsw-alias-state-business-primary'],
+      link,
+      `${theme.id} business accent`,
+    )
+    assert.equal(
+      t['--dsw-focus-ring-color'],
+      link,
+      `${theme.id} focus accent`,
+    )
 
     for (const state of ['success', 'warn', 'error'] as const) {
       const color = t[`--dsw-alias-state-${state}-primary`] as `#${string}`

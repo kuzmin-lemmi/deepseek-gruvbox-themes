@@ -20,7 +20,9 @@ Seven Gruvbox themes for [DeepSeek Harness](https://github.com/deepseek-ai/deeps
 | `gruvbox-light-soft`     | light  | `#f2e5bc` | `#b57614` |
 | `gruvbox-whale`          | dark   | `#282828` | `#83a598` |
 
-Every theme overrides **129 tokens**: backgrounds and surfaces, the sidebar, borders, primary through caption text, brand and buttons, interaction states, success/warning/error/business states, menus, composer, scrollbars, Markdown and diff colors, the Shiki syntax variables, and terminal colors through `--dsw-alias-bg-base` / `--dsw-alias-label-primary`.
+Every theme overrides **130 tokens**: backgrounds and surfaces, the sidebar, borders, primary through caption text, brand and buttons, interaction states, success/warning/error/business states, menus, composer, scrollbars, Markdown and diff colors, the Shiki syntax variables, and terminal colors through `--dsw-alias-bg-base` / `--dsw-alias-label-primary`.
+
+The accent is wired where it reads as identity rather than noise: links, keyboard focus rings, `@` reference chips, the active settings row, and settings-card borders. Large surfaces stay neutral.
 
 The picker adds a **Gruvbox themes** row with a live preview card per theme (each card is drawn with that theme's own colors), a **Follow system appearance** switch, and a **Use standard theme** reset.
 

@@ -54,7 +54,6 @@
   },
   "devDependencies": {
     "@deepseek-ai/schemastery": "~3.19.0",
-    "@esbuild/win32-x64": "0.25.12",
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.0",
     "esbuild": "^0.25.0",

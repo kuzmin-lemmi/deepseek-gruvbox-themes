@@ -11,9 +11,6 @@ importers:
       '@deepseek-ai/schemastery':
         specifier: ~3.19.0
         version: 3.19.0
-      '@esbuild/win32-x64':
-        specifier: 0.25.12
-        version: 0.25.12
       '@types/node':
         specifier: ^24.0.0
         version: 24.19.2
@@ -303,7 +300,8 @@ snapshots:
   '@esbuild/win32-ia32@0.25.12':
     optional: true
 
-  '@esbuild/win32-x64@0.25.12': {}
+  '@esbuild/win32-x64@0.25.12':
+    optional: true
 
   '@standard-schema/spec@1.1.0': {}
 

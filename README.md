@@ -1,5 +1,7 @@
 # deepseek-gruvbox-themes
 
+[![ci](https://github.com/kuzmin-lemmi/deepseek-gruvbox-themes/actions/workflows/ci.yml/badge.svg)](https://github.com/kuzmin-lemmi/deepseek-gruvbox-themes/actions/workflows/ci.yml)
+
 Seven Gruvbox themes for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), with a preview picker in **Settings → General**, a saved selection, automatic light/dark following, and a small agent tool for switching themes from chat.
 
 ![Generated previews of all seven themes](docs/previews/contact-sheet.png)
@@ -57,8 +59,11 @@ dsh plugin --profile desktop add ./deepseek-gruvbox-themes
 Other supported forms:
 
 ```sh
-# after the repository is published
-dsh plugin --profile desktop add github:<owner>/deepseek-gruvbox-themes
+# from GitHub
+dsh plugin --profile desktop add github:kuzmin-lemmi/deepseek-gruvbox-themes
+
+# from a local checkout
+dsh plugin --profile desktop add ./deepseek-gruvbox-themes
 
 # after the package is published to npm
 dsh plugin --profile desktop add deepseek-gruvbox-themes

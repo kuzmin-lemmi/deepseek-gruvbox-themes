@@ -1,5 +1,7 @@
 # deepseek-gruvbox-themes
 
+[![ci](https://github.com/kuzmin-lemmi/deepseek-gruvbox-themes/actions/workflows/ci.yml/badge.svg)](https://github.com/kuzmin-lemmi/deepseek-gruvbox-themes/actions/workflows/ci.yml)
+
 Семь тем Gruvbox для [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness): переключатель с предпросмотром в разделе **Настройки → Основные**, сохранение выбора, автоматическое следование светлой/тёмной схеме системы и небольшой инструмент для агента.
 
 ![Сгенерированные превью всех семи тем](docs/previews/contact-sheet.png)
@@ -57,8 +59,11 @@ dsh plugin --profile desktop add ./deepseek-gruvbox-themes
 Другие варианты:
 
 ```sh
-# после публикации репозитория
-dsh plugin --profile desktop add github:<owner>/deepseek-gruvbox-themes
+# из GitHub
+dsh plugin --profile desktop add github:kuzmin-lemmi/deepseek-gruvbox-themes
+
+# из локальной копии
+dsh plugin --profile desktop add ./deepseek-gruvbox-themes
 
 # после публикации пакета в npm
 dsh plugin --profile desktop add deepseek-gruvbox-themes

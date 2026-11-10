@@ -4,9 +4,9 @@
 
 Seven Gruvbox themes for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), with a preview picker in **Settings → General**, a saved selection, automatic light/dark following, and a small agent tool for switching themes from chat.
 
-![Generated previews of all seven themes](docs/previews/contact-sheet.png)
+![Gruvbox Light Medium in DeepSeek Harness](docs/screenshots/light-medium.png)
 
-> The image above is generated from the same palette data the plugin registers. It is an illustration, not a screenshot of the running application.
+Real DeepSeek Harness with **Gruvbox Light Medium**. The chat panel is cropped to keep workspace names private; see [Screenshots](#screenshots) for Dark Medium, the sidebar lockup, and the switch recording.
 
 ## What you get
 
@@ -27,6 +27,32 @@ The accent is wired where it reads as identity rather than noise: links, keyboar
 The picker adds a **Gruvbox themes** row with a live preview card per theme (each card is drawn with that theme's own colors), a **Follow system appearance** switch, and a **Use standard theme** reset.
 
 Switching is a 180 ms cross-fade when the engine supports view transitions. The new palette is installed before the base scheme flips, so a light↔dark switch never paints the old light tokens on a dark canvas, and an in-flight settings echo cannot revert the choice halfway through the write.
+
+## Screenshots
+
+Captured from the running DeepSeek Harness window with the plugin installed:
+
+| Gruvbox Dark Medium | Gruvbox Light Medium |
+| ------------------- | -------------------- |
+| ![Gruvbox Dark Medium](docs/screenshots/dark-medium.png) | ![Gruvbox Light Medium](docs/screenshots/light-medium.png) |
+
+The sidebar brand lockup takes the theme accent:
+
+| Dark Medium | Light Medium |
+| ----------- | ------------ |
+| ![DeepSeek lockup in Gruvbox Dark Medium](docs/screenshots/brand-dark-medium.png) | ![DeepSeek lockup in Gruvbox Light Medium](docs/screenshots/brand-light-medium.png) |
+
+A real 1.2 s recording of a light-to-dark switch; the cross-fade is visible:
+
+![Light to Dark switch](docs/screenshots/switch-light-dark.gif)
+
+The chat panel is cropped so workspace names are not published.
+
+### All seven palettes
+
+![Generated previews of all seven themes](docs/previews/contact-sheet.png)
+
+> The contact sheet above is generated from the same palette data the plugin registers. It is an illustration, not a screenshot of the running application.
 
 ## Compatibility and API basis
 
@@ -164,7 +190,7 @@ pnpm run previews:png   # additionally renders the contact sheet with Pillow
 - `lib/index.js` — Host half, ESM, schemastery bundled in, zero runtime dependencies;
 - `lib/client.js` — browser half in the Harness module-loader factory format, React external.
 
-The tests cover the official palette anchors, required token coverage, WCAG contrast for text and state colors, the selection model, the light/dark override builder, and the pre-plugin boot rows.
+The tests cover the official palette anchors, required token coverage, WCAG contrast for text and state colors, the selection model, the light/dark override builder, and the pre-plugin boot rows. The GitHub Actions workflow runs the same install, typecheck, tests, and build on **Windows, macOS, and Linux**.
 
 ### Project layout
 

@@ -1,0 +1,6 @@
+# esbuild ships its native binary in the platform package
+# (@esbuild/win32-x64 here), so its postinstall check is not required.
+# Skipping install scripts also keeps `pnpm install` usable in restricted
+# environments where a child process cannot use piped stdio.
+ignoreScripts: true
+strictDepBuilds: false

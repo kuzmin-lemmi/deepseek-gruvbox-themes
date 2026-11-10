@@ -1,0 +1,63 @@
+{
+  "name": "deepseek-gruvbox-themes",
+  "version": "1.0.0",
+  "description": "Seven Gruvbox themes for DeepSeek Harness, with a preview picker, persisted selection, and system light/dark following.",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "theme",
+    "gruvbox"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.28.5",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.ru.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test --test-isolation=none test/palette.test.ts test/themes.test.ts test/selection.test.ts test/boot.test.ts",
+    "previews": "node scripts/previews.mjs",
+    "previews:png": "node scripts/previews.mjs && python scripts/contact_sheet.py",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@deepseek-ai/schemastery": "~3.19.0",
+    "@esbuild/win32-x64": "0.25.12",
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.3.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  }
+}
